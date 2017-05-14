@@ -15,6 +15,7 @@
 typedef struct {
   char *str;
   int len;
+  int fd;
 } mrb_bsdevdev_data;
 
 static const struct mrb_data_type mrb_bsdevdev_data_type = {
@@ -24,8 +25,8 @@ static const struct mrb_data_type mrb_bsdevdev_data_type = {
 static mrb_value mrb_bsdevdev_init(mrb_state *mrb, mrb_value self)
 {
   mrb_bsdevdev_data *data;
-  char *str;
-  int len;
+  char device[16];
+  mrb_int num;
 
   data = (mrb_bsdevdev_data *)DATA_PTR(self);
   if (data) {
@@ -34,34 +35,32 @@ static mrb_value mrb_bsdevdev_init(mrb_state *mrb, mrb_value self)
   DATA_TYPE(self) = &mrb_bsdevdev_data_type;
   DATA_PTR(self) = NULL;
 
-  mrb_get_args(mrb, "s", &str, &len);
+  mrb_get_args(mrb, "i", &num);
   data = (mrb_bsdevdev_data *)mrb_malloc(mrb, sizeof(mrb_bsdevdev_data));
-  data->str = str;
-  data->len = len;
+  snprintf(device, sizeof(device), "/dev/input/event%u", num);
+  data->fd = open(device, O_RDWR);
   DATA_PTR(self) = data;
 
   return self;
 }
 
-static mrb_value mrb_bsdevdev_hello(mrb_state *mrb, mrb_value self)
+static mrb_value mrb_bsdevdev_getsw(mrb_state *mrb, mrb_value self)
 {
   mrb_bsdevdev_data *data = DATA_PTR(self);
 
-  return mrb_str_new(mrb, data->str, data->len);
+  char sw[4];
+  int res = ioctl(fd, EVIOCGSW(4), &sw);
+
+  mrb_fixnum_value(sw[3]);
 }
 
-static mrb_value mrb_bsdevdev_hi(mrb_state *mrb, mrb_value self)
-{
-  return mrb_str_new_cstr(mrb, "hi!!");
-}
 
 void mrb_mruby_bsdevdev_gem_init(mrb_state *mrb)
 {
   struct RClass *bsdevdev;
   bsdevdev = mrb_define_class(mrb, "BsdEvdev", mrb->object_class);
   mrb_define_method(mrb, bsdevdev, "initialize", mrb_bsdevdev_init, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, bsdevdev, "hello", mrb_bsdevdev_hello, MRB_ARGS_NONE());
-  mrb_define_class_method(mrb, bsdevdev, "hi", mrb_bsdevdev_hi, MRB_ARGS_NONE());
+  mrb_define_method(mrb, bsdevdev, "hello", mrb_bsdevdev_getsw, MRB_ARGS_NONE());
   DONE;
 }
 
