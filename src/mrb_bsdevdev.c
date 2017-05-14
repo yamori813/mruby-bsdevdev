@@ -10,13 +10,22 @@
 #include "mruby/data.h"
 #include "mrb_bsdevdev.h"
 
+#include <err.h>
+#include <errno.h>
+#include <sysexits.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+
 #include "input.h"
 
 #define DONE mrb_gc_arena_restore(mrb, 0);
 
 typedef struct {
-  char *str;
-  int len;
   int fd;
 } mrb_bsdevdev_data;
 
@@ -51,7 +60,7 @@ static mrb_value mrb_bsdevdev_getsw(mrb_state *mrb, mrb_value self)
   mrb_bsdevdev_data *data = DATA_PTR(self);
 
   char sw[4];
-  int res = ioctl(fd, EVIOCGSW(4), &sw);
+  int res = ioctl(data->fd, EVIOCGSW(4), &sw);
 
   mrb_fixnum_value(sw[3]);
 }
