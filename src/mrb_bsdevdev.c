@@ -10,6 +10,8 @@
 #include "mruby/data.h"
 #include "mrb_bsdevdev.h"
 
+#include "input.h"
+
 #define DONE mrb_gc_arena_restore(mrb, 0);
 
 typedef struct {
