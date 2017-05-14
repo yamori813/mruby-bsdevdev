@@ -36,7 +36,7 @@ static const struct mrb_data_type mrb_bsdevdev_data_type = {
 static mrb_value mrb_bsdevdev_init(mrb_state *mrb, mrb_value self)
 {
   mrb_bsdevdev_data *data;
-  char device[16];
+  char device[32];
   mrb_int num;
 
   data = (mrb_bsdevdev_data *)DATA_PTR(self);
