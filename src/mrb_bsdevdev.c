@@ -62,7 +62,7 @@ static mrb_value mrb_bsdevdev_getsw(mrb_state *mrb, mrb_value self)
   char sw[4];
   int res = ioctl(data->fd, EVIOCGSW(4), &sw);
 
-  mrb_fixnum_value(sw[3]);
+  return mrb_fixnum_value(sw[3]);
 }
 
 
@@ -71,7 +71,7 @@ void mrb_mruby_bsdevdev_gem_init(mrb_state *mrb)
   struct RClass *bsdevdev;
   bsdevdev = mrb_define_class(mrb, "BsdEvdev", mrb->object_class);
   mrb_define_method(mrb, bsdevdev, "initialize", mrb_bsdevdev_init, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, bsdevdev, "hello", mrb_bsdevdev_getsw, MRB_ARGS_NONE());
+  mrb_define_method(mrb, bsdevdev, "getsw", mrb_bsdevdev_getsw, MRB_ARGS_NONE());
   DONE;
 }
 
