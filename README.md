@@ -13,13 +13,9 @@ end
 ```
 ## example
 ```ruby
-p BsdEvdev.hi
-#=> "hi!!"
-t = BsdEvdev.new "hello"
-p t.hello
-#=> "hello"
-p t.bye
-#=> "hello bye"
+t = BsdEvdev.new(0)
+p t.getsw
+#=> 7
 ```
 
 ## License
