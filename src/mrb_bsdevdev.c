@@ -55,6 +55,17 @@ static mrb_value mrb_bsdevdev_init(mrb_state *mrb, mrb_value self)
   return self;
 }
 
+static mrb_value mrb_bsdevdev_getname(mrb_state *mrb, mrb_value self)
+{
+  mrb_bsdevdev_data *data = DATA_PTR(self);
+
+  char name[128];
+  int res = ioctl(data->fd, EVIOCGNAME(128), &name);
+
+  return mrb_str_new_cstr(mrb, name);
+}
+
+
 static mrb_value mrb_bsdevdev_getsw(mrb_state *mrb, mrb_value self)
 {
   mrb_bsdevdev_data *data = DATA_PTR(self);
@@ -65,12 +76,12 @@ static mrb_value mrb_bsdevdev_getsw(mrb_state *mrb, mrb_value self)
   return mrb_fixnum_value(sw[3]);
 }
 
-
 void mrb_mruby_bsdevdev_gem_init(mrb_state *mrb)
 {
   struct RClass *bsdevdev;
   bsdevdev = mrb_define_class(mrb, "BsdEvdev", mrb->object_class);
   mrb_define_method(mrb, bsdevdev, "initialize", mrb_bsdevdev_init, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, bsdevdev, "getname", mrb_bsdevdev_getsw, MRB_ARGS_NONE());
   mrb_define_method(mrb, bsdevdev, "getsw", mrb_bsdevdev_getsw, MRB_ARGS_NONE());
   DONE;
 }
