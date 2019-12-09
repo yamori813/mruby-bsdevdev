@@ -9,6 +9,7 @@
 #include "mruby.h"
 #include "mruby/data.h"
 #include "mrb_bsdevdev.h"
+#include "mruby/array.h"
 
 #include <err.h>
 #include <errno.h>
@@ -55,6 +56,27 @@ static mrb_value mrb_bsdevdev_init(mrb_state *mrb, mrb_value self)
   return self;
 }
 
+static mrb_value mrb_bsdevdev_read(mrb_state *mrb, mrb_value self)
+{
+  mrb_bsdevdev_data *data = DATA_PTR(self);
+  mrb_value res;
+  char buf[24];
+  int type, code, val;
+
+  read(data->fd, buf, sizeof(buf));
+
+  type = (buf[16] << 8) | buf[17];
+  code = (buf[18] << 8) | buf[19];
+  val = (buf[20] << 24) | (buf[21] << 16) | (buf[22] << 8) | buf[23];
+
+  res = mrb_ary_new(mrb);
+  mrb_ary_push(mrb, res, mrb_fixnum_value(type));
+  mrb_ary_push(mrb, res, mrb_fixnum_value(code));
+  mrb_ary_push(mrb, res, mrb_fixnum_value(val));
+
+  return res;
+}
+
 static mrb_value mrb_bsdevdev_getname(mrb_state *mrb, mrb_value self)
 {
   mrb_bsdevdev_data *data = DATA_PTR(self);
@@ -83,6 +105,7 @@ void mrb_mruby_bsdevdev_gem_init(mrb_state *mrb)
   mrb_define_method(mrb, bsdevdev, "initialize", mrb_bsdevdev_init, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, bsdevdev, "getname", mrb_bsdevdev_getname, MRB_ARGS_NONE());
   mrb_define_method(mrb, bsdevdev, "getsw", mrb_bsdevdev_getsw, MRB_ARGS_NONE());
+  mrb_define_method(mrb, bsdevdev, "read", mrb_bsdevdev_read, MRB_ARGS_NONE());
   DONE;
 }
 
