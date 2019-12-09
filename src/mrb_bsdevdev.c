@@ -8,8 +8,8 @@
 
 #include "mruby.h"
 #include "mruby/data.h"
-#include "mrb_bsdevdev.h"
 #include "mruby/array.h"
+#include "mrb_bsdevdev.h"
 
 #include <err.h>
 #include <errno.h>
